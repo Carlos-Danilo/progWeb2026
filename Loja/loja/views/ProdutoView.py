@@ -30,4 +30,5 @@ def list_produto_view(request, id=None):
     if id is not None:
         produtos = produtos.filter(id=id)
     print(produtos)
+    print(f"ID recebido: {id}")
     return HttpResponse('<h1>Produto de id %s!</h1>' % id)
