@@ -56,6 +56,15 @@ def edit_produto_view(request, id=None):
     context = {'produto': produto}
     return render(request, template_name='produto/produto-edit.html', context=context, status=200)
 
+def delete_produto_view(request, id=None):
+    # Processa o evento GET gerado pela action
+    produtos = Produto.objects.all()
+    if id is not None:
+        produtos = produtos.filter(id=id)
+    produto = produtos.first()
+    print(produto)
+    context = {'produto': produto}
+    return render(request, template_name='produto/produto-delete.html', context=context, status=200)
 
 def edit_produto_postback(request, id=None):
     if request.method == 'POST':
