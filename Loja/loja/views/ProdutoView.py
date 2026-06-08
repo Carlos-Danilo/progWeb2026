@@ -66,6 +66,21 @@ def delete_produto_view(request, id=None):
     context = {'produto': produto}
     return render(request, template_name='produto/produto-delete.html', context=context, status=200)
 
+def delete_produto_postback(request, id=None):
+    # Processa o postback de exclusão
+    if request.method == 'POST':
+        id_prod = request.POST.get('id')
+        print('delete postback id:', id_prod)
+        try:
+            obj = Produto.objects.filter(id=id_prod).first()
+            if obj is not None:
+                obj.delete()
+                print('Produto %s excluído com sucesso' % id_prod)
+        except Exception as e:
+            print('Erro excluindo produto: %s' % e)
+    return redirect('/produto')
+
+
 def edit_produto_postback(request, id=None):
     if request.method == 'POST':
         id = request.POST.get("id")
