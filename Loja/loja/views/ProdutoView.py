@@ -70,7 +70,9 @@ def delete_produto_view(request, id=None):
         produtos = produtos.filter(id=id)
     produto = produtos.first()
     print(produto)
-    context = {'produto': produto}
+    Fabricantes = Fabricante.objects.all()
+    Categorias = Categoria.objects.all()
+    context = {'produto': produto, 'fabricantes': Fabricantes, 'categorias': Categorias}
     return render(request, template_name='produto/produto-delete.html', context=context, status=200)
 
 def delete_produto_postback(request, id=None):
@@ -82,10 +84,17 @@ def delete_produto_postback(request, id=None):
         print("postback-delete")
         print(id)
         try:
-            Produto.objects.filter(id=id).delete()
-            print("Produto %s excluido com sucesso" % produto)
+            obj = Produto.objects.filter(id=id).first()
+            if obj is not None:
+                try:
+                    if obj.image:
+                        obj.image.delete(save=False)
+                except Exception as e:
+                    print(f"Erro removendo arquivo de imagem: {e}")
+                obj.delete()
+                print("Produto %s excluido com sucesso" % produto)
         except Exception as e:
-            print("Erro salvando edição de produto: %s" % e)
+            print("erro salvndo edição de produto: %s" % e)
     return redirect("/produto")
 
 
@@ -115,6 +124,15 @@ def edit_produto_postback(request, id=None):
             obj_produto.categoria = Categoria.objects.filter(id=categoria).first()
             if msgPromocao is not None:
                 obj_produto.msgPromocao = msgPromocao
+            # Se for anexado arquivo na edição, salva na pasta e guarda nome no objeto
+            if 'image' in request.FILES:
+                imagefile = request.FILES['image']
+                if imagefile:
+                    print(imagefile)
+                    fs = FileSystemStorage()
+                    filename = fs.save(f"produtos/{imagefile.name}", imagefile)
+                    if filename:
+                        obj_produto.image = filename
             obj_produto.save()
             print("Produto %s salvo com sucesso" % produto)
         except Exception as e:
@@ -156,6 +174,13 @@ def create_produto_view(request, id=None):
             obj_produto.Produto = produto
             obj_produto.destaque = (destaque is not None)
             obj_produto.promocao = (promocao is not None)
+            # associe categoria e fabricante se foram selecionados
+            categoria_fk = request.POST.get('CategoriaFk')
+            fabricante_fk = request.POST.get('FabricanteFk')
+            if fabricante_fk is not None and fabricante_fk != "-1":
+                obj_produto.fabricante = Fabricante.objects.filter(id=fabricante_fk).first()
+            if categoria_fk is not None and categoria_fk != "-1":
+                obj_produto.categoria = Categoria.objects.filter(id=categoria_fk).first()
             if msgPromocao is not None:
                 obj_produto.msgPromocao = msgPromocao
             obj_produto.preco = Decimal('0')
@@ -172,7 +197,8 @@ def create_produto_view(request, id=None):
                 if imagefile:
                     print(imagefile)
                     fs = FileSystemStorage()
-                    filename = fs.save(imagefile.name, imagefile)
+                    # salve na subpasta 'produtos' dentro de MEDIA_ROOT
+                    filename = fs.save(f"produtos/{imagefile.name}", imagefile)
                     if filename:
                         obj_produto.image = filename
             obj_produto.save()
@@ -180,4 +206,8 @@ def create_produto_view(request, id=None):
         except Exception as e:
             print("Erro inserindo produto: %s" % e)
         return redirect("/produto")
-    return render(request, template_name='produto/produto-create.html',status=200)
+    # GET -> enviar as listas para popular os selects
+    Fabricantes = Fabricante.objects.all()
+    Categorias = Categoria.objects.all()
+    context = {'fabricantes': Fabricantes, 'categorias': Categorias}
+    return render(request, template_name='produto/produto-create.html', context=context, status=200)
