@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Fabricantes{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="content">
+    <div class="container">
+        <div class="alert alert-info">
+            <a href="{% url 'create_fabricante' %}" class="btn btn-primary mr-2"><i class="fa fa-plus"></i> Novo Fabricante</a>
+            Fabricantes encontrados [{{ fabricantes | length }}]
+        </div>
+        {% for fabricante in fabricantes %}
+        <div class="row">
+            <h5 class="col-md-4">{{ fabricante.Fabricante }}</h5>
+            <a href="{% url 'edit_fabricante' fabricante.id %}" class="btn bg-secondary mb-2 mr-2 text-white"><i class="fa fa-edit"></i> Editar</a>
+            <a href="{% url 'delete_fabricante' fabricante.id %}" class="btn btn-warning mb-2"><i class="fa fa-sign-in"></i> Apagar</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}

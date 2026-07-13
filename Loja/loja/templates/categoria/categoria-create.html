@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nova Categoria{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="content">
+    <div class="container">
+        <form method="POST" action="/categoria/create">
+            {% csrf_token %}
+            <div class="row">
+                <label for="Categoria" class="col-md-2">Categoria</label>
+                <input class="form-control col-md-6" type="text" name="Categoria" id="Categoria" required>
+            </div>
+            <div class="row mt-3">
+                <button type="submit" class="btn btn-danger col-md-2 mt-3 mr-2"><i class="fa fa-check"></i> Inserir</button>
+                <a href="{% url 'categoria' %}" class="btn bg-secondary col-md-2 mt-3"><i class="fa fa-rotate-left"></i> Retornar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}
