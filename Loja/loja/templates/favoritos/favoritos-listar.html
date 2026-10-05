@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Produtos favoritos{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="content">
+    <div class="container">
+        <div class="alert alert-info">
+            <h3>Meus produtos favoritos</h3>
+        </div>
+        {% if favoritos %}
+        <div class="row">
+            {% for favorito in favoritos %}
+            <div class="col-xs-9 col-md-3 col-lg-3">
+                <div class="card mb-4">
+                    <div class="image-circle" style="background-image: url('/media/{{ favorito.produto.image }}');"></div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ favorito.produto.Produto }}</h5>
+                        <p class="card-text">R$ {{ favorito.produto.preco|floatformat:2 }}</p>
+                        <a href="{% url 'create_carrinhoitem' favorito.produto.id %}" class="btn btn-primary mb-2">
+                            <i class="fa fa-shopping-cart"></i> Comprar
+                        </a>
+                        <form method="POST" action="{% url 'remover_favorito' favorito.produto.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fa fa-heart"></i> Remover favorito
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-warning">Você ainda não favoritou produtos.</div>
+        {% endif %}
+        <a href="{% url 'home' %}" class="btn btn-secondary">Voltar à loja</a>
+    </div>
+</div>
+{% endblock %}

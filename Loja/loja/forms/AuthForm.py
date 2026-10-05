@@ -20,7 +20,7 @@ class RegisterForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
 
-    email = forms.CharField(
+    email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={'class': 'form-control'})
     )

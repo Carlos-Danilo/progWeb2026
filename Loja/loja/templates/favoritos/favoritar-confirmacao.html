@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Favoritar produto{% endblock %}
+
+{% block content %}
+<div id="content">
+    <div class="container">
+        <div class="alert alert-info">
+            <h3>Adicionar aos favoritos</h3>
+            <p>Deseja favoritar {{ produto.Produto }}?</p>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="fa fa-heart"></i> Favoritar
+            </button>
+            <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

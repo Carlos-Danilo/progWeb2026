@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Carrinho{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="content">
+    <div class="container">
+        {% if carrinho and carrinho.user %}
+        <div class="alert alert-info">
+            <h3>Compra Confirmada</h3>
+            <h5>Usuário: {{ carrinho.user }}</h5>
+        </div>
+        <div class="alert alert-info">
+            <h5>Pedido Número: {{ carrinho.id }}</h5>
+        </div>
+        <div class="row font-weight-bold">
+            <div class="col-md-4">Produto</div>
+            <div class="col-md-2">Quantidade</div>
+            <div class="col-md-2">Preço</div>
+            <div class="col-md-2">Total</div>
+        </div>
+        {% for item in itens %}
+        <div class="row mb-2">
+            <div class="col-md-4">{{ item.produto.Produto }}</div>
+            <div class="col-md-2">{{ item.quantidade }}</div>
+            <div class="col-md-2">R$ {{ item.preco|floatformat:2 }}</div>
+            <div class="col-md-2">R$ {{ item.total|floatformat:2 }}</div>
+        </div>
+        {% endfor %}
+        <div class="alert alert-info">
+            <h5 class="mt-4">Total: R$ {{ carrinho.total|floatformat:2 }}</h5>
+        </div>
+        {% else %}
+        <div class="alert alert-warning mt-4" role="alert">
+            Seu carrinho está vazio ou não foi finalizado.
+        </div>
+        <a href="{% url 'produto' %}" class="btn btn-primary mt-3">Ir à loja</a>
+        {% endif %}
+        <div class="mt-4">
+            <a href="{% url 'produto' %}" class="btn btn-secondary">Voltar à loja</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

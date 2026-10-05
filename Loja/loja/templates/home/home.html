@@ -37,10 +37,32 @@
                         <div class="image-circle" style="background-image: url('/media/{{ prod.image }}');"></div>
                         <div class="card-body">
                             <h5 class="card-title">{{ prod.Produto }}</h5>
-                            <a href="{% url 'home' %}" class="btn btn-primary btn-card">
-                                <i class="fa fa-shopping-cart"></i> Carrinho
+                            <p class="card-text">R$ {{ prod.preco|floatformat:2 }}</p>
+                            <a href="{% url 'create_carrinhoitem' prod.id %}" class="btn btn-primary btn-card">
+                                <i class="fa fa-shopping-cart"></i> Comprar
                             </a>
-                            <a href="{% url 'home' %}" class="btn bg-secondary btn-card text-white">
+                            {% if user.is_authenticated %}
+                            {% if prod.id in favoritos_ids %}
+                            <form method="POST" action="{% url 'remover_favorito' prod.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning btn-card">
+                                    <i class="fa fa-heart"></i> Favorito
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="POST" action="{% url 'favoritar_produto' prod.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-card">
+                                    <i class="fa fa-heart-o"></i> Favoritar
+                                </button>
+                            </form>
+                            {% endif %}
+                            {% else %}
+                            <a href="{% url 'favoritar_produto' prod.id %}" class="btn btn-outline-danger btn-card">
+                                <i class="fa fa-heart-o"></i> Favoritar
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'details_produto' prod.id %}" class="btn bg-secondary btn-card text-white">
                                 <i class="fa fa-search"></i> Detalhes
                             </a>
                         </div>

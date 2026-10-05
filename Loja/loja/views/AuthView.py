@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from loja.forms.AuthForm import LoginForm, RegisterForm
+from django.utils.http import url_has_allowed_host_and_scheme
 
 
 def login_view(request):
@@ -12,16 +13,24 @@ def login_view(request):
         return redirect('/')
 
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-
         loginForm = LoginForm(request.POST)
 
         if loginForm.is_valid():
-            user = authenticate(username=username, password=password)
+            user = authenticate(
+                request,
+                username=loginForm.cleaned_data['username'],
+                password=loginForm.cleaned_data['password']
+            )
 
             if user is not None:
                 login(request, user)
+                next_url = request.GET.get('next')
+                if next_url and url_has_allowed_host_and_scheme(
+                    next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure(),
+                ):
+                    return redirect(next_url)
                 return redirect('/')
             else:
                 message = {
@@ -46,6 +55,11 @@ def login_view(request):
     )
 
 
+def logout_view(request):
+    logout(request)
+    return redirect('/login')
+
+
 def register_view(request):
     registerForm = RegisterForm()
     message = None
@@ -54,13 +68,12 @@ def register_view(request):
         return redirect('/')
 
     if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-
         registerForm = RegisterForm(request.POST)
 
         if registerForm.is_valid():
+            username = registerForm.cleaned_data['username']
+            email = registerForm.cleaned_data['email']
+            password = registerForm.cleaned_data['password']
             verifyUsername = User.objects.filter(
                 username=username
             ).first()
